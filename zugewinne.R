@@ -58,11 +58,11 @@ wahlbezirke_zugewinne_viz <- wahlbezirke_zugewinne_vergleich |>
           color = "white") +
   geom_sf(aes(fill = diff_cat), # Add districts borders
           color = "white", 
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = stadtbezirke, # Add districts area: election results
           fill = NA,
           color = "#6F003C",
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   theme_void() + # Remove plot elements
   scale_fill_brewer(name = "", palette = "Reds") + # Add reds scale
   labs(title = "Wo wurde Göttingen roter?", # Add labels
@@ -70,10 +70,22 @@ wahlbezirke_zugewinne_viz <- wahlbezirke_zugewinne_vergleich |>
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
   theme(legend.direction = "horizontal",
         legend.position = "bottom",
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 16),
         text = element_text(family = "Work Sans", colour = "white"),
-        plot.background = element_rect(fill = "#6F003C"),
-        plot.caption = element_text(hjust = 1, vjust = -2),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = 12, 
+                                    hjust = 1, 
+                                    vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.title = element_text(family = "Work Sans Black", size = 20, hjust = 0.5)) 
+        plot.subtitle = element_text(size = 16, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = 22, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_viz.png",
+       wahlbezirke_zugewinne_viz,
+       width = 80,
+       height = 75,
+       units = "mm")

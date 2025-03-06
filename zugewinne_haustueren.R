@@ -54,6 +54,7 @@ haustueren_bezirk <- haustueren |>
             .by = vorwahlkampf) |> 
   rename(bezirk = vorwahlkampf)
 
+# Join results and campaigning data
 wahlbezirke_zugewinne_vergleich_tueren <- wahlbezirke_zugewinne_vergleich |> 
   left_join(haustueren_bezirk,
             by = c("WBez" = "bezirk"))
@@ -75,32 +76,47 @@ wahlbezirke_zugewinne_vergleich_tueren_kreise <- wahlbezirke_zugewinne_vergleich
           color = "white") +
   geom_sf(aes(fill = diff_cat), # Add districts borders
           color = "white", 
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = stadtbezirke, # Add districts area: election results
           fill = NA,
           color = "#6F003C",
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_point(aes(size = tueren,
                  geometry = geometry),
              pch = 21,
              fill = alpha("lightgrey", 0.2),
              col = "black",
+             stroke = 0.25,
              stat = "sf_coordinates") +
   theme_void() + # Remove plot elements
   scale_size_continuous(name = "Geklopfte Türen") +
-  scale_fill_brewer(name = "Zugewinne\nggü. BTW 2021\n(in %-Punkten)", 
+  scale_fill_brewer(name = "Zugewinne", 
                     palette = "Reds") + # Add reds scale
   labs(title = "You'll never knock alone?", # Add labels
-       subtitle = "Geklopfte Türen und Zweistimmenzuwächse im Vergleich",
+       subtitle = "Geklopfte Türen und Zweistimmenzuwächse ggü. BTW 2021 (in %-Punkten) im Vergleich",
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
-  theme(legend.position = "left",
-        legend.text = element_text(size = 14),
+  theme(legend.direction = "vertical",
+        legend.position = "left",
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 18),
         text = element_text(family = "Work Sans", colour = "white"),
-        plot.background = element_rect(fill = "#6F003C"),
-        plot.caption = element_text(hjust = 1, vjust = -2),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = 14, 
+                                    hjust = 1, 
+                                    vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.title = element_text(family = "Work Sans Black", size = 20, hjust = 0.5))
+        plot.subtitle = element_text(size = 18, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = 24, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_tueren_viz_kreise.png",
+       wahlbezirke_zugewinne_vergleich_tueren_kreise,
+       width = 120,
+       height = 85,
+       units = "mm")
 
 # Visualize: Fixed borders
 wahlbezirke_zugewinne_vergleich_tueren_grenzen <- wahlbezirke_zugewinne_vergleich_tueren |> 
@@ -118,30 +134,42 @@ wahlbezirke_zugewinne_vergleich_tueren_grenzen <- wahlbezirke_zugewinne_vergleic
           color = "white") +
   geom_sf(aes(fill = diff_cat), # Add districts borders
           color = "white", 
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = stadtbezirke, # Add districts area: election results
           fill = NA,
           color = "#6F003C",
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = wahlbezirke_zugewinne_vergleich_tueren |> 
             filter(!is.na(tueren)),
           fill = NA,
           color = "yellow",
-          linewidth = 0.5) +
+          linewidth = 0.25) +
   theme_void() + # Remove plot elements
   scale_fill_brewer(name = "", palette = "Reds") + # Add reds scale
   labs(title = "You'll never knock alone?", # Add labels
-       subtitle = "Geklopfte Türen und Zweistimmenzuwächse im Vergleich",
+       subtitle = "Haustürwahlkampf und Zweistimmenzuwächse im Vergleich",
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
   theme(legend.direction = "horizontal",
         legend.position = "bottom",
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 16),
         text = element_text(family = "Work Sans", colour = "white"),
-        plot.background = element_rect(fill = "#6F003C"),
-        plot.caption = element_text(hjust = 1, vjust = -2),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = 12, 
+                                    hjust = 1, 
+                                    vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.title = element_text(family = "Work Sans Black", size = 20, hjust = 0.5)) 
+        plot.subtitle = element_text(size = 16, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = 22, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_tueren_viz_grenzen.png",
+       wahlbezirke_zugewinne_vergleich_tueren_grenzen,
+       width = 80,
+       height = 75,
+       units = "mm")
 
 # Visualize: stripe pattern fill
 wahlbezirke_zugewinne_vergleich_tueren_streifen <- wahlbezirke_zugewinne_vergleich_tueren |> 
@@ -159,33 +187,47 @@ wahlbezirke_zugewinne_vergleich_tueren_streifen <- wahlbezirke_zugewinne_verglei
           color = "white") +
   geom_sf(aes(fill = diff_cat), # Add districts borders
           color = "white", 
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = stadtbezirke, # Add districts area: election results
           fill = NA,
           color = "#6F003C",
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf_pattern(data = wahlbezirke_zugewinne_vergleich_tueren |> 
                     filter(!is.na(tueren)),
                   fill = NA,
                   color = "black",
+                  linewidth = NA,
                   pattern = "stripe",
                   pattern_angle = 45,
                   pattern_density = 0.5,
-                  pattern_fill = NA) +
+                  pattern_fill = NA,
+                  pattern_size = 0.3) +
   theme_void() + # Remove plot elements
   scale_fill_brewer(name = "", palette = "Reds") + # Add reds scale
   labs(title = "You'll never knock alone?", # Add labels
-       subtitle = "Geklopfte Türen und Zweistimmenzuwächse im Vergleich",
+       subtitle = "Haustürwahlkampf und Zweistimmenzuwächse im Vergleich",
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
   theme(legend.direction = "horizontal",
         legend.position = "bottom",
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 16),
         text = element_text(family = "Work Sans", colour = "white"),
-        plot.background = element_rect(fill = "#6F003C"),
-        plot.caption = element_text(hjust = 1, vjust = -2),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = 12, 
+                                    hjust = 1, 
+                                    vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.title = element_text(family = "Work Sans Black", size = 20, hjust = 0.5)) 
+        plot.subtitle = element_text(size = 16, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = 22, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_tueren_viz_streifen.png",
+       wahlbezirke_zugewinne_vergleich_tueren_streifen,
+       width = 80,
+       height = 75,
+       units = "mm")
 
 # Visualize: point pattern fill
 wahlbezirke_zugewinne_vergleich_tueren_punkte <- wahlbezirke_zugewinne_vergleich_tueren |> 
@@ -203,32 +245,44 @@ wahlbezirke_zugewinne_vergleich_tueren_punkte <- wahlbezirke_zugewinne_vergleich
           color = "white") +
   geom_sf(aes(fill = diff_cat), # Add districts borders
           color = "white", 
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf(data = stadtbezirke, # Add districts area: election results
           fill = NA,
           color = "#6F003C",
-          linewidth = 0.35) +
+          linewidth = 0.15) +
   geom_sf_pattern(data = wahlbezirke_zugewinne_vergleich_tueren |> 
                     filter(!is.na(tueren)),
-                  size = 0.1,
+                  size = 0.03,
                   color = "black",
                   fill = NA,
                   pattern = "pch",
                   pattern_angle = 0,
-                  pattern_density = 0.5,
+                  pattern_density = 0.2,
                   pattern_shape = 20,
-                  pattern_spacing = 0.01) +
+                  pattern_spacing = 0.015) +
   theme_void() + # Remove plot elements
   scale_fill_brewer(name = "", palette = "Reds") + # Add reds scale
   labs(title = "You'll never knock alone?", # Add labels
-       subtitle = "Geklopfte Türen und Zweistimmenzuwächse im Vergleich",
+       subtitle = "Haustürwahlkampf und Zweistimmenzuwächse im Vergleich",
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
   theme(legend.direction = "horizontal",
         legend.position = "bottom",
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 16),
         text = element_text(family = "Work Sans", colour = "white"),
-        plot.background = element_rect(fill = "#6F003C"),
-        plot.caption = element_text(hjust = 1, vjust = -2),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = 12, 
+                                    hjust = 1, 
+                                    vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.title = element_text(family = "Work Sans Black", size = 20, hjust = 0.5)) 
+        plot.subtitle = element_text(size = 16, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = 22, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_tueren_viz_punkte.png",
+       wahlbezirke_zugewinne_vergleich_tueren_punkte,
+       width = 80,
+       height = 75,
+       units = "mm")
