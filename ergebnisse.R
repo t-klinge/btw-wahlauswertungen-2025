@@ -66,7 +66,8 @@ wahlbezirke_ergebnisse_viz <- wahlbezirke_ergebnisse |>
                                      hjust = 0.5),
         plot.title = element_text(family = "Work Sans Black", 
                                   size = 22, 
-                                  hjust = 0.5))
+                                  hjust = 0.5),
+        legend.key.size = unit(3, "mm"))
 
 # Save output
 ggsave(filename = "./output/wahlbezirke_ergebnisse_viz.png",
