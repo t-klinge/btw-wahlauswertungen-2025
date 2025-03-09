@@ -26,6 +26,12 @@ wahlbezirke_ergebnisse <- wahlbezirke |>
               select(4, 5:8),
             by = c("WBez" = "gebiet-nr"))
 
+# Specify sizes
+size_title = 30
+size_subtitle = size_title * 2/3
+size_legend = size_title * 2/3
+size_caption = size_title * 2/5
+
 # Visualize
 wahlbezirke_ergebnisse_viz <- wahlbezirke_ergebnisse |>
   filter(!is.na(WBez)) |> 
@@ -54,18 +60,18 @@ wahlbezirke_ergebnisse_viz <- wahlbezirke_ergebnisse |>
        caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
   theme(legend.direction = "horizontal",
         legend.position = "bottom",
-        legend.text = element_text(size = 16),
+        legend.text = element_text(size = size_legend),
         text = element_text(family = "Work Sans", colour = "white"),
         plot.background = element_rect(fill = "#6F003C",
                                        colour = NA),
-        plot.caption = element_text(size = 12, 
+        plot.caption = element_text(size = size_caption, 
                                     hjust = 1, 
                                     vjust = -2),
         plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
-        plot.subtitle = element_text(size = 16, 
+        plot.subtitle = element_text(size = size_subtitle, 
                                      hjust = 0.5),
         plot.title = element_text(family = "Work Sans Black", 
-                                  size = 22, 
+                                  size = size_title, 
                                   hjust = 0.5),
         legend.key.size = unit(3, "mm"))
 
