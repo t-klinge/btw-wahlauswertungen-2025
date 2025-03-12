@@ -1,4 +1,5 @@
 library(janitor) # Data cleaning
+library(RColorBrewer) # Colors
 library(sf) # Geodata handling
 library(showtext) # Font handling
 library(tidyverse) # Data wrangling
@@ -37,7 +38,6 @@ btw2125_vergleich <- btw21_ergebnisse_wahlbezirke |>
   left_join(btw25_ergebnisse_wahlbezirke |> 
               transmute(ags, `gebiet-nr`, `gebiet-name`, linke_prozent_2025 = prozent_linke)) |> 
   mutate(diff_2021_2025 = round(linke_prozent_2025 - linke_prozent_2021, digits = 1)) |> 
-  select(`gebiet-nr`, `gebiet-name`, diff_2021_2025) |> 
   filter(!is.na(diff_2021_2025))
 
 # Calculate change: BTW 17 to BTW 25
@@ -46,7 +46,6 @@ btw1725_vergleich <- btw17_ergebnisse_wahlbezirke |>
   left_join(btw25_ergebnisse_wahlbezirke |> 
               transmute(`gebiet-nr`, `gebiet-name`, linke_prozent_2025 = prozent_linke)) |> 
   mutate(diff_2017_2025 = round(linke_prozent_2025 - linke_prozent_2017, digits = 1)) |> 
-  select(`gebiet-nr`, `gebiet-name`, diff_2017_2025) |> 
   filter(!is.na(diff_2017_2025))
 
 # Read geodata
@@ -70,7 +69,62 @@ size_subtitle = size_title * 2/3
 size_legend = size_title * 2/3
 size_caption = size_title * 2/5
 
-# Visualize
+# Visualize: 2025 vs. 2017 - detailed
+wahlbezirke_zugewinne_btw1725_detail_viz <- wahlbezirke_zugewinne_btw1725_vergleich |> 
+  filter(!is.na(diff_2017_2025)) |> 
+  mutate(diff_cat = cut(diff_2017_2025, 
+                        breaks = seq(-7.5, 17.5, 2.5))) |> 
+  ggplot() +
+  geom_sf(data = stadtbezirke, # Add districts area: uniform color
+          fill = "lightgrey",
+          color = "white") +
+  geom_sf(aes(fill = diff_cat), # Add districts borders
+          color = "darkgrey", 
+          linewidth = 0.15) +
+  geom_sf(data = stadtbezirke, # Add districts area: election results
+          fill = NA,
+          color = "#6F003C",
+          linewidth = 0.15) +
+  theme_void() + # Remove plot elements
+  scale_fill_manual(name = "",
+                    values = c(brewer.pal(3, "Blues")[3],
+                               brewer.pal(3, "Blues")[2],
+                               brewer.pal(3, "Blues")[1],
+                               brewer.pal(7, "Reds")[1],
+                               brewer.pal(7, "Reds")[2],
+                               brewer.pal(7, "Reds")[3],
+                               brewer.pal(7, "Reds")[4],
+                               brewer.pal(7, "Reds")[5],
+                               brewer.pal(7, "Reds")[6],
+                               brewer.pal(7, "Reds")[7])) +
+  labs(title = "Wo wurde Göttingen roter?", # Add labels
+       subtitle = "Veränderungen im Vergleich zur BTW 2017 (in %-Punkten)",
+       caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
+  theme(legend.direction = "vertical",
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(2, "mm"),
+        legend.position = "left",
+        legend.text = element_text(size = size_legend),
+        text = element_text(family = "Work Sans", colour = "white"),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = size_caption, 
+                                    hjust = 1, 
+                                    vjust = -2),
+        plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
+        plot.subtitle = element_text(size = size_subtitle, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = size_title, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_btw1725_viz_detail.png",
+       wahlbezirke_zugewinne_btw1725_detail_viz,
+       width = 100,
+       height = 75,
+       units = "mm")
+
+# Visualize: 2025 vs. 2017
 wahlbezirke_zugewinne_btw1725_viz <- wahlbezirke_zugewinne_btw1725_vergleich |> 
   filter(!is.na(diff_2017_2025)) |> 
   mutate(diff_cat = case_when(between(diff_2017_2025, -Inf, -0.1) ~ "\u22640",
@@ -118,6 +172,54 @@ ggsave(filename = "./output/wahlbezirke_zugewinne_btw1725_viz.png",
        height = 75,
        units = "mm")
 
+# Visualize: 2025 vs. 2021 - detailed
+wahlbezirke_zugewinne_btw2125_detailed_viz <- wahlbezirke_zugewinne_btw2125_vergleich |> 
+  filter(!is.na(diff_2021_2025)) |> 
+  mutate(diff_cat = cut(diff_2021_2025, 
+                        breaks = seq(0, 22.5, 2.5))) |> 
+  ggplot() +
+  geom_sf(data = stadtbezirke, # Add districts area: uniform color
+          fill = "lightgrey",
+          color = "white") +
+  geom_sf(aes(fill = diff_cat), # Add districts borders
+          color = "white", 
+          linewidth = 0.15) +
+  geom_sf(data = stadtbezirke, # Add districts area: election results
+          fill = NA,
+          color = "#6F003C",
+          linewidth = 0.15) +
+  theme_void() + # Remove plot elements
+  scale_fill_brewer(name = "",
+                    palette = "Reds") +
+  labs(title = "Wo wurde Göttingen roter?", # Add labels
+       subtitle = "Veränderungen im Vergleich zur BTW 2021 (in %-Punkten)",
+       caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
+  theme(legend.direction = "vertical",
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(2, "mm"),
+        legend.position = "left",
+        legend.text = element_text(size = size_legend),
+        text = element_text(family = "Work Sans", colour = "white"),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = size_caption, 
+                                    hjust = 1, 
+                                    vjust = -2),
+        plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
+        plot.subtitle = element_text(size = size_subtitle, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = size_title, 
+                                  hjust = 0.5))
+
+ggsave(filename = "./output/wahlbezirke_zugewinne_btw2125_detailed_viz.png",
+       wahlbezirke_zugewinne_btw2125_detailed_viz,
+       width = 100,
+       height = 75,
+       units = "mm")
+
+
+# Visualize: 2025 vs. 2021
 wahlbezirke_zugewinne_btw2125_viz <- wahlbezirke_zugewinne_btw2125_vergleich |> 
   filter(!is.na(diff_2021_2025)) |> 
   mutate(diff_cat = case_when(between(diff_2021_2025, -Inf, -0.1) ~ "\u22640",

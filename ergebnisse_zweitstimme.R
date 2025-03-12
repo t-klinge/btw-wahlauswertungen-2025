@@ -80,3 +80,49 @@ ggsave(filename = "./output/wahlbezirke_ergebnisse_viz.png",
        width = 80,
        height = 75,
        units = "mm")
+
+# Visualize with smaller intervals
+wahlbezirke_ergebnisse_viz_detail <- wahlbezirke_ergebnisse |>
+  filter(!is.na(WBez)) |> 
+  rename("bezirk_name" = "BEZIR_NAME") |>
+  mutate(prozent_linke_cat = cut(prozent_linke, breaks = seq(0,45,5))) |> 
+  ggplot() +
+  geom_sf(data = stadtbezirke, # Add districts area: uniform color
+          fill = "lightgrey",
+          color = "white") +
+  geom_sf(aes(fill = prozent_linke_cat), # Add districts borders
+          color = "white", 
+          linewidth = 0.15) +
+  geom_sf(data = stadtbezirke, # Add districts area: election results
+          fill = NA,
+          color = "#6F003C",
+          linewidth = 0.15) +
+  theme_void() + # Remove plot elements
+  scale_fill_viridis_d(name = "", option = "rocket", direction = -1) +
+  labs(title = "Wie rot ist Göttingen?", # Add labels
+       subtitle = "Zweitstimmenergebnisse bei der BTW 2025 (in %)",
+       caption = "Ohne Berücksichtigung von Briefwahlergebnissen") +
+  theme(legend.direction = "vertical",
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(2, "mm"),
+        legend.position = "left",
+        legend.text = element_text(size = size_legend),
+        text = element_text(family = "Work Sans", colour = "white"),
+        plot.background = element_rect(fill = "#6F003C",
+                                       colour = NA),
+        plot.caption = element_text(size = size_caption, 
+                                    hjust = 1, 
+                                    vjust = -2),
+        plot.margin = unit(c(0.3, 0.2, 0.3, 0.2), "cm"),
+        plot.subtitle = element_text(size = size_subtitle, 
+                                     hjust = 0.5),
+        plot.title = element_text(family = "Work Sans Black", 
+                                  size = size_title, 
+                                  hjust = 0.5))
+
+# Save output
+ggsave(filename = "./output/wahlbezirke_ergebnisse_viz_detail.png",
+       wahlbezirke_ergebnisse_viz_detail,
+       width = 100,
+       height = 75,
+       units = "mm")
